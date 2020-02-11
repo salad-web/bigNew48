@@ -15,10 +15,13 @@
   <script src="./libs/jquery-1.12.4.min.js"></script>
   <!-- 引入bootstrap的js文件 -->
   <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
 </head>
 
 <body>
-  <div class="main_wrap">
+  <div class="main_wrap" id="app">
     <div class="header">
       <a href="#" class="logo"><img src="images/logo.png" alt="" /></a>
       <div class="copyright">
@@ -28,16 +31,81 @@
 
     <div class="login_form_con">
       <div class="login_title"></div>
-      <form class="login_form">
+      <form ref="reference" class="login_form" v-on:submit.prevent=''>
         <i class="iconfont icon-user"></i>
         <i class="iconfont icon-key"></i>
-        <input type="text" class="input_txt" placeholder="邮箱/手机号" />
-        <input type="password" class="input_pass" placeholder="密码" />
-        <input type="submit" class="input_sub" value="登 录" />
+        <input type="text" class="input_txt" placeholder="邮箱/手机号" v-model="username" />
+        <input type="password" class="input_pass" placeholder="密码" v-model="password" />
+        <input type="submit" @click="dclick" class="input_sub" value="登 录" />
       </form>
+    </div>
+
+    <!-- Button trigger modal -->
+    <!-- <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+      Launch demo modal
+    </button> -->
+
+    <!-- Modal -->
+    
+  </div>
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">温馨提示</h4>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+          <!-- <button type="button" class="btn btn-primary">取消</button> -->
+        </div>
+      </div>
     </div>
   </div>
 
 </body>
+<script src="./libs/vue.js"></script>
+<script>
+  let vm = new Vue({
+    el: "#app",
+    data() {
+      return {
+        username: '',
+        password: ''
+      }
+    },
+    // 登录的按钮
+    methods: {
+      async dclick() {
+        // 提示信息
+        let username = this.username;
+        let password = this.password;
+        if (username == '' || password == '') {
+          $('#myModal').modal();
+        }
+        // 这样 登录上传的格式  不是 josn 而是一个字符串
+        const params = new URLSearchParams();
+        params.append('username', username);
+        params.append('password', password);
+        let ret = await axios.post('http://localhost:8080/api/v1/admin/user/login', params);
+        console.log(ret);
+        if (ret.data.code == 200) {
+          window.sessionStorage.setItem('token',ret.data.token);
+          $('.modal-body').text(ret.data.msg);
+          $('#myModal').modal();
+          $('#myModal').on('hidden.bs.modal', function (e) {
+            location.href = './index.html';
+          })
+        } else {
+          $('.modal-body').text(ret.data.msg)
+          $('#myModal').modal();
+        }
+      }
+    },
+  });
+</script>
 
 </html>
