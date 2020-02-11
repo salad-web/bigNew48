@@ -67,6 +67,7 @@
   </div>
 
 </body>
+<script src="./libs/http.js"></script>
 <script src="./libs/vue.js"></script>
 <script>
   let vm = new Vue({
@@ -90,7 +91,7 @@
         const params = new URLSearchParams();
         params.append('username', username);
         params.append('password', password);
-        let ret = await axios.post('http://localhost:8080/api/v1/admin/user/login', params);
+        let ret = await axios.post(BigNew.user_login, params);
         console.log(ret);
         if (ret.data.code == 200) {
           window.sessionStorage.setItem('token',ret.data.token);

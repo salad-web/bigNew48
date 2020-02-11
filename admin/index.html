@@ -56,6 +56,7 @@
         </div>
     </div>
 </body>
+<script src="./libs/http.js"></script>
 <script src="./libs/vue.js"></script>
 <script>
     let vm = new Vue({
@@ -88,7 +89,7 @@
                     return config
                 })
             // 把令牌带过来 
-            axios.get('http://localhost:8080/api/v1/admin/user/info', config).then(({
+            axios.get(BigNew.user_info, config).then(({
                 data: res
             }) => {
                 //{data : res} ES 解构
