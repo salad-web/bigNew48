@@ -46,7 +46,7 @@
     </button> -->
 
     <!-- Modal -->
-    
+
   </div>
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
@@ -94,7 +94,7 @@
         let ret = await axios.post(BigNew.user_login, params);
         console.log(ret);
         if (ret.data.code == 200) {
-          window.sessionStorage.setItem('token',ret.data.token);
+          window.sessionStorage.setItem('token', ret.data.token);
           $('.modal-body').text(ret.data.msg);
           $('#myModal').modal();
           $('#myModal').on('hidden.bs.modal', function (e) {
@@ -104,8 +104,34 @@
           $('.modal-body').text(ret.data.msg)
           $('#myModal').modal();
         }
-      }
-    },
+
+
+        // ajax的方法
+        // $.ajax({
+        //     type: 'post',
+        //     url: BigNew.user_login,
+        //     data : {
+        //       username :username,
+        //       password :password
+        //     },
+        //     success(backData) {
+        //       if (backData.code == 200) {
+        //         window.sessionStorage.setItem('token', backData.token);
+        //         $('.modal-body').text(backData.msg);
+        //         $('#myModal').modal();
+        //         $('#myModal').on('hidden.bs.modal', function (e) {
+        //           location.href = './index.html';
+        //         })
+        //       } else {
+        //         $('.modal-body').text(backData.msg)
+        //         $('#myModal').modal();
+        //       }
+        //     }
+        // })
+    }
+
+
+  },
   });
 </script>
 

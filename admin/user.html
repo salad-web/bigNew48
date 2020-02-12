@@ -15,40 +15,43 @@
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid" id="app">
         <div class="common_title">
             用户信息修改
         </div>
         <div class="container-fluid common_con">
-            <form class="form-horizontal article_form" id="form">
+            <form class="form-horizontal article_form" id="form" v-on:submit.prevent='' ref='formName'>
                 <div class="form-group">
                     <label for="inputEmail1" class="col-sm-2 control-label">用户名称：</label>
                     <div class="col-sm-4">
-                        <input type="text" name="username" class="form-control username" id="inputEmail1" value="李思思">
+                        <input type="text" name="username" class="form-control username" id="inputEmail1"
+                            v-model='list.nickname'>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail2" class="col-sm-2 control-label">昵称：</label>
                     <div class="col-sm-4">
-                        <input type="text" name="nickname" class="form-control nickname" id="inputEmail2" value="哈哈思">
+                        <input type="text" name="nickname" class="form-control nickname" id="inputEmail2"
+                            v-model='list.username'>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">邮箱：</label>
                     <div class="col-sm-4">
-                        <input type="text" name="email" class="form-control email" id="inputEmail3" value="520@163.com">
+                        <input type="text" name="email" class="form-control email" id="inputEmail3"
+                            v-model='list.email'>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
-                        <img src="images/2.jpg" alt="" class="user_pic">
-                        <input style="display: block" name="userPic" type="file" id="exampleInputFile">
+                        <img :src="src" alt="" class="user_pic">
+                        <input style="display: block" name="userPic" type="file" id="exampleInputFile" @change='pclick'>
                         <!-- 给label标签的for属性赋值,值是input标签的id,那这样的话点击label就相当于点击了input -->
                         <br>
                         <label for="exampleInputFile">
-                            <img src="./images/uploads_icon.jpg" style="height: 50px;" alt="">
+                            <img :src="src" style="height: 50px;" alt="">
                         </label>
                     </div>
                 </div>
@@ -57,17 +60,96 @@
                     <label for="inputEmail4" class="col-sm-2 control-label">密码：</label>
                     <div class="col-sm-4">
                         <input type="password" name="password" class="form-control password" id="inputEmail4"
-                            value="12345678">
+                            v-model='list.password'>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success btn-edit">修改</button>
+                        <button @click='sclick("formName")' type="submit" class="btn btn-success btn-edit">修改</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 </body>
+<script src="./libs/vue.js"></script>
+<script src="./libs/http.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data() {
+            return {
+                list: [],
+                src: ''
+            }
+        },
+        methods: {
+            pclick() {
+                let file = event.target.files[0];
+                //1.3 将文件转为src路径
+                let url = window.URL.createObjectURL(file);
+                //1.4 将url路径赋值给img标签的src
+                this.src = url
+            },
+            sclick(formName) {
+                let fd = new FormData(this.$refs['formName']);
+                console.log(fd);
+
+                // 1.第一种方法
+                // axios.post(BigNew.user_edit, fd).then(({data : res}) => {
+                //     if (res.code == 200) {
+                //         //新增成功
+                //         alert('新增成功!');
+                //     }
+                // }).catch(res => {
+                //     console.log(res)
+                // })
+
+                //2.第二种方法
+                //    console.log(this.$refs.formName);
+                //     this.$refs.formName.validate(async valid => {
+                //         // if( !a ) return;
+                //         const {data : res} = await this.axios.post(BigNew.user_edit,fd);
+                //         if (res.code == 200) {
+                //             //新增成功
+                //             callback();
+                //             alert('新增成功!');
+                //         }
+                //     })
+
+                // 第三种方法!
+                // $.ajax({
+                //     type: 'post',
+                //     url: BigNew.user_edit,
+                //     dataType: 'json',
+                //     data: fd,
+                //     Authorization = window.sessionStorage.getItem("token"),
+                //     contentType: false,
+                //     processData: false,
+                //     success : (backData) => {
+                //         console.log(backData);
+                //     }
+                // })
+            }
+        },
+        created() {
+            let config = axios.interceptors.request.use(config => {
+                //为请求头对象，添加token验证的Authorization字段
+                config.headers.Authorization = window.sessionStorage.getItem("token");
+                return config
+            })
+            // 把令牌带过来 
+            axios.get(BigNew.user_detail, config).then(({
+                data: res
+            }) => {
+                //{data : res} ES 解构
+                console.log(res.data);
+                this.list = res.data;
+                this.src = res.data.userPic
+            });
+        },
+    })
+</script>
 
 </html>
