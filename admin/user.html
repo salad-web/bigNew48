@@ -65,7 +65,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button @click='sclick("formName")' type="submit" class="btn btn-success btn-edit">修改</button>
+                        <button @click='sclick' type="submit" class="btn btn-success btn-edit">修改</button>
                     </div>
                 </div>
             </form>
@@ -92,33 +92,22 @@
                 //1.4 将url路径赋值给img标签的src
                 this.src = url
             },
-            sclick(formName) {
+            sclick() {
                 let fd = new FormData(this.$refs['formName']);
                 console.log(fd);
 
                 // 1.第一种方法
-                // axios.post(BigNew.user_edit, fd).then(({data : res}) => {
-                //     if (res.code == 200) {
-                //         //新增成功
-                //         alert('新增成功!');
-                //     }
-                // }).catch(res => {
-                //     console.log(res)
-                // })
+                axios.post(BigNew.user_edit, fd).then(({data : res}) => {
+                    if (res.code == 200) {
+                        //新增成功
+                        alert('新增成功!');
+                        parent.location.reload();
+                    }
+                }).catch(res => {
+                    console.log(res)
+                })
 
-                //2.第二种方法
-                //    console.log(this.$refs.formName);
-                //     this.$refs.formName.validate(async valid => {
-                //         // if( !a ) return;
-                //         const {data : res} = await this.axios.post(BigNew.user_edit,fd);
-                //         if (res.code == 200) {
-                //             //新增成功
-                //             callback();
-                //             alert('新增成功!');
-                //         }
-                //     })
-
-                // 第三种方法!
+                // 第二种方法!
                 // $.ajax({
                 //     type: 'post',
                 //     url: BigNew.user_edit,
@@ -131,7 +120,35 @@
                 //         console.log(backData);
                 //     }
                 // })
+                //         this.$nextTick(function(){
+                //     this.$refs["ruleForm"].validate()
+                // })
+                // 3.第三种方法请求
+                //    console.log(this.$refs.formName);
+                //     this.$refs.formName.validate(async valid => {
+                //         // if( !valid ) return;
+                //         const {data : res} = await this.axios.post(BigNew.user_edit,fd);
+                //         if (res.code == 200) {
+                //             //新增成功
+                //             callback();
+                //             alert('新增成功!');
+                //         }
+                //     })
+                // this.$nextTick(() => {
+                //     console.log(this.$refs.formName);
+                //     this.$refs.formName.validate(async valid => {
+                //         // if( !valid ) return;
+                //         const {
+                //             data: res
+                //         } = await this.axios.post(BigNew.user_edit, fd);
+                //         if (res.code == 200) {
+                //             //新增成功
+                //             alert('新增成功!');
+                //         }
+                //     })
+                // })
             }
+
         },
         created() {
             let config = axios.interceptors.request.use(config => {
@@ -143,7 +160,7 @@
             axios.get(BigNew.user_detail, config).then(({
                 data: res
             }) => {
-                //{data : res} ES 解构
+                
                 console.log(res.data);
                 this.list = res.data;
                 this.src = res.data.userPic
