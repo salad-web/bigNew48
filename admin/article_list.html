@@ -25,21 +25,7 @@
         <div class="container-fluid common_con">
             <div class="row opt_btns">
                 <div class="col-xs-6">
-                    <form class="form-inline">
-                        <select id="selCategory" name="" class="form-control input-sm">
-                            <option value="">所有分类</option>
-                            <option>未分类</option>
-                            <option>奇趣事</option>
-                            <option>会生活</option>
-                            <option>爱旅行</option>
-                        </select>
-                        <select id="selStatus" name="" class="form-control input-sm">
-                            <option value="">所有状态</option>
-                            <option value="草稿">草稿</option>
-                            <option value="已发布">已发布</option>
-                        </select>
-                        <button id="btnSearch" class="btn btn-default btn-sm">筛选</button>
-                    </form>
+                    <cps></cps>
                 </div>
                 <div class="col-xs-6">
                     <a href="article_release.html" class="btn btn-success btn-sm pull-right" id="release_btn">发表文章</a>
@@ -49,8 +35,39 @@
             <div class="row text-center">
             </div>
         </div>
+        <!-- 分页模块 -->
+        <div class="row text-center">
+            <ul class="pagination pagination-sm">
+                <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
+                <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
+                <li class="page-item active"><a href="#" class="page-link">1</a></li>
+                <li class="page-item"><a href="#" class="page-link">2</a></li>
+                <li class="page-item"><a href="#" class="page-link">3</a></li>
+                <li class="page-item"><a href="#" class="page-link">4</a></li>
+                <li class="page-item"><a href="#" class="page-link">5</a></li>
+                <li class="page-item"><a href="#" class="page-link">6</a></li>
+                <li class="page-item"><a href="#" class="page-link">7</a></li>
+                <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
+                <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
+            </ul>
+        </div>
+
     </div>
 
+    <template id="cps">
+        <form class="form-inline">
+            <select id="selCategory" name="" class="form-control input-sm">
+                <option value="">所有分类</option>
+                <option v-for="(item, index) in lists" :key="index">{{item.name}}</option>
+            </select>
+            <select id="selStatus" name="" class="form-control input-sm">
+                <option value="">所有状态</option>
+                <option value="草稿">{{noote}}</option>
+                <option value="已发布">{{handout}}</option>
+            </select>
+            <button id="btnSearch" class="btn btn-default btn-sm" @click="sclick">筛选</button>
+        </form>
+    </template>
 
     <template id="cpn">
         <table class="table table-striped table-bordered table-hover mp20">
@@ -65,12 +82,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>王积千造统最头</td>
-                    <td>杰克</td>
-                    <td>奇趣事</td>
-                    <td class="text-center">2017-06-08 07:08:46</td>
-                    <td class="text-center">已发布</td>
+                <tr v-for="(item, index) in list" :key="index">
+                    <td>{{item.title}}</td>
+                    <td>{{item.author}}</td>
+                    <td>{{item.category}}</td>
+                    <td class="text-center">{{item.date}}</td>
+                    <td class="text-center">{{item.state}}</td>
                     <td class="text-center">
                         <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
                         <a href="javascript:void(0);" class="btn btn-danger btn-xs delete">删除</a>
@@ -89,7 +106,7 @@
         el: "#app",
         data() {
             return {
-                list: []
+
             }
         },
         components: {
@@ -97,34 +114,84 @@
                 template: '#cpn',
                 data() {
                     return {
-                        
+                        list: []
                     }
                 },
                 created() {
+                    // 这里面先空着
 
+                    //这里发送ajax 请求 获取文章的列表!!!
+                    //请求在到达服务器之前，先会调用use中的这个回调函数来添加请求头信息
+                    // 拦截器
+                    let config = axios.interceptors.request.use(config => {
+                        //为请求头对象，添加token验证的Authorization字段
+                        config.headers.Authorization = window.sessionStorage.getItem("token");
+                        return config
+                    })
+                    // 把令牌带过来 
+                    axios.get(BigNew.article_query, config).then(({
+                        data: res
+                    }) => {
+                        //{data : res} ES 解构
+                        console.log(res.data);
+                        this.list = res.data.data;
+                    });
+
+                },
+            },
+            'cps': {
+                template: '#cps',
+                data() {
+                    return {
+                        lists: [],
+                        noote: '草稿',
+                        handout: '未发布'
+                    }
+                },
+                methods: {
+                    sclick() {
+                        let config = axios.interceptors.request.use(config => {
+                            //为请求头对象，添加token验证的Authorization字段
+                            config.headers.Authorization = window.sessionStorage.getItem("token");
+                            return config
+                        })
+                        // 把令牌带过来 
+                        axios.get(BigNew.article_query, config).then(({
+                            data: res
+                        }) => {
+                            //{data : res} ES 解构
+                            console.log(res.data);
+                            this.lists = res.data;
+                        });
+                    }
+                },
+                mounted() {
+
+                },
+                created() {
+                    // 这里面先空着
+
+                    //这里发送ajax 请求 获取文章的列表!!!
+                    //请求在到达服务器之前，先会调用use中的这个回调函数来添加请求头信息
+                    // 拦截器
+                    let config = axios.interceptors.request.use(config => {
+                        //为请求头对象，添加token验证的Authorization字段
+                        config.headers.Authorization = window.sessionStorage.getItem("token");
+                        return config
+                    })
+                    // 把令牌带过来 
+                    axios.get(BigNew.category_list, config).then(({
+                        data: res
+                    }) => {
+                        //{data : res} ES 解构
+                        console.log(res.data);
+                        this.lists = res.data;
+                    });
                 },
             }
         },
 
-        // 这里面先空着
-        created() {
-            //这里发送ajax 请求 获取文章的列表!!!
-            //请求在到达服务器之前，先会调用use中的这个回调函数来添加请求头信息
-            // 拦截器
-            let config = axios.interceptors.request.use(config => {
-                //为请求头对象，添加token验证的Authorization字段
-                config.headers.Authorization = window.sessionStorage.getItem("token");
-                return config
-            })
-            // 把令牌带过来 
-            axios.get(BigNew.category_list, config).then(({
-                data: res
-            }) => {
-                //{data : res} ES 解构
-                // console.log(res.data);
-                this.list = res.data
-            });
-        },
+
     });
 </script>
 

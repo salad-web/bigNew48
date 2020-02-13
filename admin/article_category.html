@@ -48,8 +48,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default cancel" @click="xin">新增</button>
-                        <button type="button" class="btn btn-primary confirm" @click="en">确认</button>
+                        <button type="button" class="btn btn-default cancel" @click="xin">编辑成功</button>
+                        <button type="button" class="btn btn-primary confirm" @click="en">新增</button>
                     </div>
                 </div>
             </div>
@@ -61,7 +61,7 @@
             <thead>
                 <tr>
                     <th>名称</th>
-                    <th>Slug</th>
+                    <th>slug</th>
                     <th class="text-center" width="100">操作</th>
                 </tr>
             </thead>
@@ -71,7 +71,7 @@
                     <td>{{item.slug}}</td>
                     <td class="text-center">
                         <a href="javascript:;" data-target="#myModal" data-toggle="modal" class=" btn btn-info btn-xs"
-                            @click="eclick(item.id,item.name,item.slug)">编辑</a>
+                            @click="eclick(item.id,item.name,item.slug,index)">编辑</a>
                         <a href="javascript:;" class="btn btn-danger btn-xs" @click="dclick(item.id)">删除</a>
                     </td>
                 </tr>
@@ -96,10 +96,8 @@
         el: '#app',
         data() {
             return {
-                // id:'',
                 slug: '',
                 name: '',
-                // lists: [],
                 names: '',
                 namess: '',
                 id: ''
@@ -140,12 +138,13 @@
                     console.log(ret);
                     if (ret.code == 200) {
                         alert(ret.msg);
-                        location.reload();
-                    //     let ands = {
-                    //     name: this.name,
-                    //     slug: this.slug
-                    // };
-                    // hub.$emit('b', ands);
+                        // location.reload();
+                        let ands = {
+                        name: this.name,
+                        slug: this.slug,
+                        id : this.id
+                    };
+                    hub.$emit('b', ands);
                     }
                 });
             }
@@ -165,14 +164,15 @@
                 console.log(b);
             })
         },
-        // 模板
+        // 子组件
         components: {
             'cpn': {
                 template: '#cpn',
                 data() {
                     return {
                         list: [],
-                        id : ''
+                        id : '',
+                        index : ''
                     }
                 },
                 methods: {
@@ -219,9 +219,10 @@
                         hub.$emit('s', b);
                     },
                     //编辑的函数
-                    eclick(id, slug, name) {
+                    eclick(id, slug, name,index) {
                         let a = '编辑分类';
                         this.id = id;
+                        this.index = index;
                         hub.$emit('e', id, slug, name, a);
                         $('#myModal').on('show.bs.modal');
                     }
@@ -237,7 +238,7 @@
                     axios.get(BigNew.category_list, config).then(({
                         data: res
                     }) => {
-                        // console.log(res);
+                        console.log(res);
                         this.list = res.data
                     })
                 },
@@ -246,11 +247,11 @@
                         console.log(lists);
                         this.list.unshift(lists);
                     });
-                    // hub.$on('b', (ands) => {
-                    //     console.log(ands);
-                    //     ands = {id:this.id};
-                    //     this.list.push(ands);
-                    // })
+                    hub.$on('b', (ands) => {
+                        let list1 = this.list.splice(this.index,1,ands);
+                        this.lsit = list1
+                        $('#myModal').modal('hide')
+                    })
                 },
             }
         }
