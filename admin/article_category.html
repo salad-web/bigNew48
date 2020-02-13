@@ -70,16 +70,16 @@
                     <td>{{item.name}}</td>
                     <td>{{item.slug}}</td>
                     <td class="text-center">
-                        <a href="javascript:;" data-target="#myModal" data-toggle="modal" class=" btn btn-info btn-xs"
+                        <a href="#" data-target="#myModal" data-toggle="modal" class=" btn btn-info btn-xs"
                             @click="eclick(item.id,item.name,item.slug,index)">编辑</a>
-                        <a href="javascript:;" class="btn btn-danger btn-xs" @click="dclick(item.id)">删除</a>
+                        <a href="#" class="btn btn-danger btn-xs" @click="dclick(item.id)">删除</a>
                     </td>
                 </tr>
             </tbody>
             <tfoot>
                 <tr>
                     <td colspan="3" class="text-center">
-                        <a href="javascript:;" class="btn btn-success" id="xinzengfenlei" data-toggle="modal"
+                        <a  class="btn btn-success" id="xinzengfenlei" data-toggle="modal"
                             data-target="#myModal" @click="zclick">新增分类</a>
                     </td>
                 </tr>
@@ -111,15 +111,14 @@
                 params.append('name', this.name);
                 params.append('slug', this.slug);
                 if (this.names == '新增分类') {
-                    $('#myModal').modal('hide');
-                    // this.lists = {name : this.name,slug : this.slug};
-
+                    // console.log(params);
                     let {
                         data: ret
                     } = await axios.post(BigNew.category_add, params);
                     // console.log(ret);
                     if (ret.code == 201) {
                         alert(ret.msg);
+                        $('#myModal').modal('hide');
                         // location.reload();
                         let lists = {
                             name: this.name,
@@ -253,7 +252,7 @@
                 mounted() {
                     hub.$on('a', (lists) => {
                         console.log(lists);
-                        this.list.unshift(lists);
+                        this.list.push(lists);
                     });
                     hub.$on('b', (ands) => {
                         let list1 = this.list.splice(this.index, 1, ands);

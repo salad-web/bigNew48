@@ -15,6 +15,7 @@
     <script src="./libs/template-web.js"></script>
     <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
     <script src="./libs/axios.js"></script>
+    <script src="./libs/jquery.twbsPagination.js"></script>
 
 </head>
 
@@ -33,40 +34,38 @@
                 </div>
             </div>
             <cpn></cpn>
+            <!-- 分页模块 -->
             <div class="row text-center">
+                <ul class="pagination pagination-sm">
+                    <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
+                    <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
+                    <li class="page-item active"><a href="#" class="page-link">1</a></li>
+                    <li class="page-item"><a href="#" class="page-link">2</a></li>
+                    <li class="page-item"><a href="#" class="page-link">3</a></li>
+                    <li class="page-item"><a href="#" class="page-link">4</a></li>
+                    <li class="page-item"><a href="#" class="page-link">5</a></li>
+                    <li class="page-item"><a href="#" class="page-link">6</a></li>
+                    <li class="page-item"><a href="#" class="page-link">7</a></li>
+                    <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
+                    <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
+                </ul>
             </div>
         </div>
-        <!-- 分页模块 -->
-        <div class="row text-center">
-            <ul class="pagination pagination-sm">
-                <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
-                <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
-                <li class="page-item active"><a href="#" class="page-link">1</a></li>
-                <li class="page-item"><a href="#" class="page-link">2</a></li>
-                <li class="page-item"><a href="#" class="page-link">3</a></li>
-                <li class="page-item"><a href="#" class="page-link">4</a></li>
-                <li class="page-item"><a href="#" class="page-link">5</a></li>
-                <li class="page-item"><a href="#" class="page-link">6</a></li>
-                <li class="page-item"><a href="#" class="page-link">7</a></li>
-                <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
-                <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
-            </ul>
-        </div>
+
 
     </div>
 
     <template id="cps">
         <form class="form-inline" v-on:submit.prevent=''>
-            <select id="selCategory" name="" class="form-control input-sm">
+            <select id="selCategory" name="" class="form-control input-sm" v-model="names">
                 <option value="">所有分类</option>
-                <option v-for="(item, index) in lists" :key="index">{{item.name}}</option>
+                <option v-for="(item, index) in lists" :key="index" :value="item.id">{{item.name}}</option>
             </select>
-            <select id="selStatus" name="" class="form-control input-sm">
-                <option value="">所有状态</option>
-                <option value="草稿">{{noote}}</option>
-                <option value="已发布">{{handout}}</option>
+            <select id="selStatus" name="" class="form-control input-sm" v-model="name">
+                <option value="">所有分类</option>
+                <option :value="items" v-for="(items, index) in status" :key="index">{{items}}</option>
             </select>
-            <button id="btnSearch" class="btn btn-default btn-sm" @click="sclick">筛选</button>
+            <button id="btnSearch" class="btn btn-default btn-sm" @click="sclick()">筛选</button>
         </form>
     </template>
 
@@ -101,8 +100,142 @@
 <script src="./libs/vue.js"></script>
 <script src="./libs/http.js"></script>
 <script>
+
+    // 入口函数
+    $(function () {
+            //进到文章列表页面，就获取符合条件的文章封装成了一函数。
+            function getData(myPage, cateType, cateState) {
+                $.ajax({
+                    type: 'get',
+                    url: BigNew.article_query,
+                    data: {
+                        type: cateType,
+                        state: cateState,
+                        page: myPage,
+                        perpage: 5
+                    },
+                    success: function (backData) {
+                        //// console.log(backData);
+                        //4.把这些文章通过模板引擎渲染到页面
+                        var resHtml = template('articleList', backData);
+                        $('tbody').html(resHtml);
+
+                        //根据发送ajax请求,获取到的总页数, 来重新绘制页码条
+                        var totalPages = backData.data.totalPage;
+
+                        //获取当前页码
+                        window.currentPage = $pagination.twbsPagination('getCurrentPage');
+
+                        //判断, 如果发送ajax请求获取的总页数, 和刚才的总页数不等, 这个时候就要重绘页码条
+                        if (totalPages != myTotalPage || isTrue == true) {
+                            myTotalPage = totalPages; //把发送ajax请求获取的总页数,赋值给myTotalPage
+
+                            $pagination.twbsPagination('destroy');
+                            $pagination.twbsPagination($.extend({}, defaultOpts, {
+                                startPage: 1, //始终已第一页作为开始页
+                                totalPages: totalPages
+                            }));
+                            //进来执行了之后,记得把isTrue改成false.
+                            isTrue = false;
+                        }
+
+                    }
+                });
+            }
+
+            //声明两个变量,用来记录当前筛选的 分类名和状态值.
+            var cateType;
+            var cateState;
+            //声明一个变量,用来记录总页数,默认一开始是10
+            var myTotalPage = 10;
+            //声明一个变量,isTrue,用来记录点击的是筛选按钮.
+            var isTrue = false;
+
+            //需求: 一进到文章列表页面,就要显示真实存在的文章.
+            //思路: 一进到页面,就触发搜索按钮点击事件.
+            //$('#btnSearch').trigger('click');
+            //思路: 一进到页面,自己去发送ajax请求,获取数据,渲染.
+            //getData(1);
+
+
+            //需求: 一进到页面,显示所有的文章分类.
+            //1.一进到页面发送ajax获取所有的文章分类.
+            $.ajax({
+                type: 'get',
+                url: BigNew.category_list,
+                success: function (backData) {
+                    //// console.log(backData);
+                    if (backData.code == 200) {
+                        //2.通过模板引擎渲染到筛选按钮 左边的下拉菜单中.
+                        var resHtml = template('cateList', backData);
+                        $('#selCategory').html(resHtml);
+                    }
+                }
+            });
+
+
+            //需求: 分页
+            var $pagination = $('.pagination');
+            var defaultOpts = {
+                first: '首页',
+                prev: '上一页',
+                next: '下一页',
+                last: '末页',
+                totalPages: myTotalPage, //总页数
+                visiblePages: 5, //可见页签数
+                //什么时候执行这个方法. 单击页签的时候会触发
+                onPageClick: function (event, page) {
+                    // console.log('呵呵');
+                    //// console.log(event);//点击的触发事件
+                    //// console.log(page); //当前点击的页签的页码数.
+                    getData(page, cateType, cateState);
+                }
+            }
+            $pagination.twbsPagination(defaultOpts);
+
+            //需求: 点击筛选按钮,筛选出符合条件的文章,渲染到页面.
+            //1.给筛选按钮设置点击事件.
+            $('#btnSearch').on('click', function (e) {
+                e.preventDefault(); //阻止默认跳转
+                isTrue = true; //点击筛选按钮,就修改isTrue这个变量的值为true.
+                //2.获取筛选条件
+                //   修改下拉菜单的value值.
+                cateType = $('#selCategory').val(); //分类名
+                cateState = $('#selStatus').val(); //状态值
+                //3.发送ajax请求,获取到符合条件的文章
+                getData(1, cateType, cateState);
+            });
+
+
+
+            // //需求: 文章删除
+            // //1.给删除按钮们,委托注册事件.
+            // $('tbody').on('click', 'a.btn-delete', function () {
+            //     //2.获取要删除的文章id
+            //     var id = $(this).attr('data-id');
+            //     //3.发送ajax请求,完成删除 //软删除:一般更改一个数据里的信息,表示更改了.
+            //     $.ajax({
+            //         type: 'get',
+            //         url: 'http://localhost:80/api/v1/admin/article/delete',
+            //         data: {
+            //             id: id
+            //         },
+            //         success: function (backData) {
+            //             if (backData.code == 204) {
+            //                 //4.重新加载一下数据.
+            //                 getData(currentPage, cateType, cateState);
+            //             }
+            //         }
+            //     });
+            // });
+
+            //计算机网络 编译原理 计算机操作系统 计算机组成原理 数据库设计和分析 数电模电
+
+        });
+
     // 首先点击进来 就要发送ajax 请求 获得数据渲染页面 !!!
     //  利用模板 来渲染 
+    let hub = new Vue();
     let vm = new Vue({
         el: "#app",
         data() {
@@ -139,39 +272,43 @@
                     });
 
                 },
+                mounted() {
+                    hub.$on('e', (a) => {
+                        this.list = a;
+                    })
+                },
             },
             'cps': {
                 template: '#cps',
                 data() {
                     return {
                         lists: [],
-                        noote: '草稿',
-                        handout: '未发布'
+                        status: ['草稿', '已发布'],
+                        name: '',
+                        names: '',
+                        page : 1
                     }
                 },
                 methods: {
                     sclick() {
-                        let config = axios.interceptors.request.use(config => {
-                            //为请求头对象，添加token验证的Authorization字段
-                            config.headers.Authorization = window.sessionStorage.getItem("token");
-                            return config
-                        })
-                        // 把令牌带过来 
-
-                        axios.get(BigNew.article_query, config,{
-                            data : {
-                                type : this.noote,
-                                state : this.handout,
-                                page : 1,
-                                perpage : 5
+                        $.ajax({
+                            url: BigNew.article_query,
+                            data: {
+                                type: this.names,
+                                state: this.name,
+                                page: this.page,
+                                perpage: 8
+                            },
+                            success: (backData) => {
+                                if (backData.code == 200) {
+                                    //调用模板引擎核心方法
+                                    console.log(backData);
+                                    let a = backData.data.data;
+                                    hub.$emit('e', a);
+                                }
                             }
-                        }).then(({
-                            data: res
-                        }) => {
-                            //{data : res} ES 解构
-                            console.log(res.data);
-                            // this.lists = res.data;
                         });
+
                     }
                 },
                 mounted() {
@@ -179,7 +316,6 @@
                 },
                 created() {
                     // 这里面先空着
-
                     //这里发送ajax 请求 获取文章的列表!!!
                     //请求在到达服务器之前，先会调用use中的这个回调函数来添加请求头信息
                     // 拦截器
