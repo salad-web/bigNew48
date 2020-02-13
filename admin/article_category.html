@@ -48,7 +48,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default cancel">取消</button>
+                        <button type="button" class="btn btn-default cancel" @click='qclick'>取消</button>
                         <button type="button" class="btn btn-primary confirm" @click="en">确定</button>
                     </div>
                 </div>
@@ -89,7 +89,8 @@
 </body>
 <script src="./libs/vue.js"></script>
 <script src="./libs/http.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+<script src="./libs/axios.js"></script>
 <script>
     let hub = new Vue();
     let vm = new Vue({
@@ -131,7 +132,6 @@
                     // const params = new URLSearchParams();
                     // params.append('name', this.name);
                     // params.append('slug', this.slug);
-                    console.log(11111);
                     params.append('id', this.id);
                     let {
                         data: ret
@@ -148,10 +148,14 @@
                         hub.$emit('b', ands);
                     }
                 }
-
+            },
+            qclick() {
+                // 新增 没有新增 点击了取消  就把里面的值清空
+                this.name ='';
+                this.slug= '';
+                $('#myModal').modal('hide');
             }
         },
-        
         //监听
         mounted() {
             hub.$on('e', (id, name, slug, a) => {
