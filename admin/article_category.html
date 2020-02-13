@@ -33,7 +33,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                 aria-hidden="true">&times;</span></button>
                         <!-- <input type="hidden" name="" v-model="names"> -->
-                        <h4 class="modal-title" id="exampleModalLabel">{{names}}{{namess}}</h4>
+                        <h4 class="modal-title" id="exampleModalLabel">{{names}}</h4>
                     </div>
                     <div class="modal-body">
                         <form id="form">
@@ -48,8 +48,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default cancel" @click="xin">编辑成功</button>
-                        <button type="button" class="btn btn-primary confirm" @click="en">新增</button>
+                        <button type="button" class="btn btn-default cancel">取消</button>
+                        <button type="button" class="btn btn-primary confirm" @click="en">确定</button>
                     </div>
                 </div>
             </div>
@@ -99,59 +99,62 @@
                 slug: '',
                 name: '',
                 names: '',
-                namess: '',
+                // namess: '',
                 id: ''
             }
         },
         methods: {
             // 新增的函数
             async en() {
-                $('#myModal').modal('hide');
-                // this.lists = {name : this.name,slug : this.slug};
+                const params = new URLSearchParams();
+                params.append('name', this.name);
+                params.append('slug', this.slug);
+                if (this.names == '新增分类') {
+                    $('#myModal').modal('hide');
+                    // this.lists = {name : this.name,slug : this.slug};
 
-                const params = new URLSearchParams();
-                params.append('name', this.name);
-                params.append('slug', this.slug);
-                let {
-                    data: ret
-                } = await axios.post(BigNew.category_add, params);
-                console.log(ret);
-                if (ret.code == 201) {
-                    alert(ret.msg);
-                    // location.reload();
-                    let lists = {
-                        name: this.name,
-                        slug: this.slug
-                    };
-                    hub.$emit('a', lists);
-                }
-            },
-            // 编辑的函数
-            xin() {
-                const params = new URLSearchParams();
-                params.append('name', this.name);
-                params.append('slug', this.slug);
-                params.append('id', this.id);
-                axios.post(BigNew.category_edit, params).then(({
-                    data: ret
-                }) => {
-                    console.log(ret);
+                    let {
+                        data: ret
+                    } = await axios.post(BigNew.category_add, params);
+                    // console.log(ret);
+                    if (ret.code == 201) {
+                        alert(ret.msg);
+                        // location.reload();
+                        let lists = {
+                            name: this.name,
+                            slug: this.slug
+                        };
+                        hub.$emit('a', lists);
+                    }
+                    // 编辑分类
+                } else if (this.names == '编辑分类') {
+                    // const params = new URLSearchParams();
+                    // params.append('name', this.name);
+                    // params.append('slug', this.slug);
+                    console.log(11111);
+                    params.append('id', this.id);
+                    let {
+                        data: ret
+                    } = await axios.post(BigNew.category_edit, params);
+                    // console.log(ret);
                     if (ret.code == 200) {
                         alert(ret.msg);
                         // location.reload();
                         let ands = {
-                        name: this.name,
-                        slug: this.slug,
-                        id : this.id
-                    };
-                    hub.$emit('b', ands);
+                            name: this.name,
+                            slug: this.slug,
+                            id: this.id
+                        };
+                        hub.$emit('b', ands);
                     }
-                });
+                }
+
             }
         },
+        
         //监听
         mounted() {
-            hub.$on('e', (id, slug, name, a) => {
+            hub.$on('e', (id, name, slug, a) => {
                 console.log(id);
                 this.name = name;
                 this.names = a;
@@ -160,7 +163,7 @@
 
             });
             hub.$on('s', (b) => {
-                this.namess = b;
+                this.names = b;
                 console.log(b);
             })
         },
@@ -171,8 +174,8 @@
                 data() {
                     return {
                         list: [],
-                        id : '',
-                        index : ''
+                        id: '',
+                        index: ''
                     }
                 },
                 methods: {
@@ -219,11 +222,11 @@
                         hub.$emit('s', b);
                     },
                     //编辑的函数
-                    eclick(id, slug, name,index) {
+                    eclick(id, slug, name, index) {
                         let a = '编辑分类';
                         this.id = id;
                         this.index = index;
-                        hub.$emit('e', id, slug, name, a);
+                        hub.$emit('e', id, name, slug, a);
                         $('#myModal').on('show.bs.modal');
                     }
 
@@ -242,13 +245,14 @@
                         this.list = res.data
                     })
                 },
+                // 监听返回修改 新增的值
                 mounted() {
                     hub.$on('a', (lists) => {
                         console.log(lists);
                         this.list.unshift(lists);
                     });
                     hub.$on('b', (ands) => {
-                        let list1 = this.list.splice(this.index,1,ands);
+                        let list1 = this.list.splice(this.index, 1, ands);
                         this.lsit = list1
                         $('#myModal').modal('hide')
                     })

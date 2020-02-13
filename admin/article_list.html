@@ -55,7 +55,7 @@
     </div>
 
     <template id="cps">
-        <form class="form-inline">
+        <form class="form-inline" v-on:submit.prevent=''>
             <select id="selCategory" name="" class="form-control input-sm">
                 <option value="">所有分类</option>
                 <option v-for="(item, index) in lists" :key="index">{{item.name}}</option>
@@ -133,7 +133,7 @@
                         data: res
                     }) => {
                         //{data : res} ES 解构
-                        console.log(res.data);
+                        // console.log(res.data);
                         this.list = res.data.data;
                     });
 
@@ -156,12 +156,20 @@
                             return config
                         })
                         // 把令牌带过来 
-                        axios.get(BigNew.article_query, config).then(({
+
+                        axios.get(BigNew.article_query, config,{
+                            data : {
+                                type : this.noote,
+                                state : this.handout,
+                                page : 1,
+                                perpage : 5
+                            }
+                        }).then(({
                             data: res
                         }) => {
                             //{data : res} ES 解构
                             console.log(res.data);
-                            this.lists = res.data;
+                            // this.lists = res.data;
                         });
                     }
                 },
