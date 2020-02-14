@@ -10,63 +10,223 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="./libs/jedate/css/jedate.css">
     <!-- jq -->
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 模板引擎 -->
     <script src="./libs/template-web.js"></script>
+    <script src="./libs/jedate/js/jedate.js"></script>
+    <script src="./libs/tinymce/tinymce.min.js"></script>
+    <script src="./libs/tinymce/tinymce_setup.js"></script>
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid" id="app">
         <div class="common_title">
             文章编辑
         </div>
         <div class="container-fluid common_con">
-            <form class="form-horizontal article_form" id="form">
+            <form class="form-horizontal article_form" id="form" ref='formName' v-on:submit.prevent=''>
                 <div class="form-group">
                     <label for="inputTitle" class="col-sm-2 control-label">文章标题：</label>
                     <div class="col-sm-10">
-                        <input type="text" name="title" class="form-control title" id="inputTitle" value="文章标题文字">
+                        <!-- 隐藏域 放id 的地方 -->
+
+
+                        <input type="text" name="title" class="form-control title" id="inputTitle" v-model="titles">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputCover" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
-                        <img src="images/pic06.jpg" class="article_cover">
-                        <input name="cover" type="file" id="inputCover">
+                        <img :src="cover" class="article_cover">
+                        <input name="cover" type="file" id="inputCover" @change="xclick">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputCategory" class="col-sm-2 control-label">文章类别：</label>
                     <div class="col-sm-4">
-                        <select class="form-control category" name="categoryId">
-                            <option>类别一</option>
-                            <option>类别二</option>
-                            <option>类别三</option>
-                            <option selected>类别四</option>
-                            <option>类别五</option>
-                        </select>
+                        <cpn></cpn>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label">发布时间：</label>
                     <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="text" name="date" class="form-control" v-model="date" id="dateinput">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"
+                                    onclick="jeDate('#dateinput',{trigger:false,format: 'YYYY-MM-DD'})"><i
+                                        class="iconfont icon-icondate"></i></button>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
                     <div class="col-sm-10">
+                        <input type="text" v-model="content" class="form-control" id="rich_content" placeholder="文章内容"
+                            value="文章内容">
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success btn-edit">修改</button>
-                        <button type="submit" class="btn btn-default btn-draft">存为草稿</button>
+                        <button type="submit" class="btn btn-success btn-edit" @click="xiucilck">修改</button>
+                        <button type="submit" class="btn btn-default btn-draft" @click="cclick">存为草稿</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+
+    <template id="cpn">
+        <select class="form-control category">
+            <option v-for="(item, index) in lists" :key="index" :value="item.id">{{item.name}}</option>
+        </select>
+    </template>
 </body>
+<script src="./libs/vue.js"></script>
+<script src="./libs/http.js"></script>
+<script src="./libs/axios.js"></script>
+<script>
+    let vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                titles: '111',
+                date: '',
+                content: '',
+                categoryId: '',
+                cover: '',
+                id: '',
+                state: ''
+            }
+        },
+        components: {
+            'cpn': {
+                template: '#cpn',
+                data() {
+                    return {
+                        lists: []
+                    }
+                },
+                created() {
+                    //这里发送ajax 请求 获取文章的列表!!!
+                    //请求在到达服务器之前，先会调用use中的这个回调函数来添加请求头信息
+                    // 拦截器
+                    let config = axios.interceptors.request.use(config => {
+                        //为请求头对象，添加token验证的Authorization字段
+                        config.headers.Authorization = window.sessionStorage.getItem("token");
+                        return config
+                    })
+                    // 把令牌带过来 
+                    axios.get(BigNew.category_list, config).then(({
+                        data: res
+                    }) => {
+                        //{data : res} ES 解构
+                        console.log(res.data);
+                        this.lists = res.data;
+                    });
+                },
+            },
+        },
+        methods: {
+            // 图片的选择 页面!!
+            xclick() {
+                let file = event.target.files[0];
+                //1.3 将文件转为src路径
+                let url = window.URL.createObjectURL(file);
+                //1.4 将url路径赋值给img标签的src
+                this.cover = url
+            },
+            xiucilck() {
+                if (this.state == '草稿') {
+                    let fd = new FormData(this.$refs['formName']);
+                    fd.append('content', this.content);
+                    fd.append('categoryId', this.categoryId);
+                    //追加文章id到fd中去.
+                    fd.append('id', this.id);
+                    fd.append('state', '已发布');
+                    axios.post(BigNew.article_edit, fd).then(({
+                        data: res
+                    }) => {
+                        if (res.code == 200) {
+                            //新增成功
+                            alert('修改成功!');
+                            location.href = './article_list.html';
+                        }
+                    }).catch(res => {
+                        console.log(res)
+                    })
+                } else {
+                    let fd = new FormData(this.$refs['formName']);
+                    fd.append('content', this.content);
+                    fd.append('categoryId', this.categoryId);
+                    //追加文章id到fd中去.
+                    fd.append('id', this.id);
+                    fd.append('state', this.state);
+                    axios.post(BigNew.article_edit, fd).then(({
+                        data: res
+                    }) => {
+                        if (res.code == 200) {
+                            //新增成功
+                            alert('修改成功!');
+                            location.href = './article_list.html';
+                        }
+                    }).catch(res => {
+                        console.log(res)
+                    })
+                }
+            },
+            cclick() {
+                if (this.state == '已发布') {
+                    let fd = new FormData(this.$refs['formName']);
+                    fd.append('content', this.content);
+                    fd.append('categoryId', this.categoryId);
+                    //追加文章id到fd中去.
+                    fd.append('id', this.id);
+                    axios.post(BigNew.article_edit, fd).then(({
+                        data: res
+                    }) => {
+                        if (res.code == 200) {
+                            //新增成功
+                            alert('修改成功!');
+                            location.href = './article_list.html';
+                        }
+                    }).catch(res => {
+                        console.log(res)
+                    })
+                }
+            }
+        },
+        created() {
+            // 拿到id值 
+            let ids = location.href.split('=')[1];
+            console.log(ids);
+            let id = parseInt(ids);
+            this.id = id;
+            // 根据 id 发送ajax 请求获取数据  渲染页面
+            $.ajax({
+                url: BigNew.article_search,
+                data: {
+                    'id': id
+                },
+                success: (backData) => {
+                    console.log(backData);
+                    if (backData.code == 200) {
+                        //3.把对应的详细信息显示在对应的标签上. 
+                        this.titles = backData.data.title;
+                        this.state = backData.data.state;
+                        console.log(this.titles);
+                        this.date = backData.data.date;
+                        this.content = backData.data.content;
+                        this.categoryId = backData.data.categoryId;
+                        this.cover = backData.data.cover;
+                    }
+                }
+            });
+        },
+    })
+</script>
 
 </html>
