@@ -42,7 +42,7 @@
                 </li>
             </ul>
 
-            <div class="level01"><a href="./comment_list.html" target="main_frame"><i
+            <div class="level01"><a href="./comment_list.html" @click="pclick" target="main_frame"><i
                         class="iconfont icon-comment"></i><span>评论管理</span></a></div>
             <div class="level01" id="user"><a href="./user.html" target="main_frame"><i
                         class="iconfont icon-user"></i><span>个人中心</span></a></div>
@@ -120,9 +120,9 @@
                 // $(this).find('b').toggleClass('rotate0');
                 // 找到点击的dom对象 // 向这个对象中添加 hide 属性
             },
-            // oneclick() {
-            //     console.log('aa');
-            // }
+            pclick() {
+                this.show = false;
+            }
         },
         mounted() {
             
