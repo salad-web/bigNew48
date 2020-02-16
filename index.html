@@ -13,105 +13,88 @@
 
 <body>
     <div id="app">
-    <div class="header">
-        <a href="#" class="logo fl"><img src="images/logo.png" alt="logo"></a>
-        <div class="search_form fl">
-            <input type="text" class="search_txt" placeholder="黑洞照片">
-            <button class="search_btn"><i class="fa fa-search"></i></button>
+        <div class="header">
+            <a href="#" class="logo fl"><img src="images/logo.png" alt="logo"></a>
+            <div class="search_form fl">
+                <input type="text" class="search_txt" placeholder="黑洞照片">
+                <button class="search_btn"><i class="fa fa-search"></i></button>
+            </div>
+            <div class="link_info fr">
+                <a href="#"><i class="fa fa-angle-right"></i>&nbsp;&nbsp;网站地图</a><br>
+                <a href="#"><i class="fa fa-angle-right"></i>&nbsp;&nbsp;招聘信息</a>
+            </div>
         </div>
-        <div class="link_info fr">
-            <a href="#"><i class="fa fa-angle-right"></i>&nbsp;&nbsp;网站地图</a><br>
-            <a href="#"><i class="fa fa-angle-right"></i>&nbsp;&nbsp;招聘信息</a>
-        </div>
-    </div>
 
-    <div class="menu_con">
-        <div class="menu">
-            <div class="menu_collapse fl">
-                <a href="javascript:;" class="level_one"><i class="fa fa-list-ul"></i>全部分类</a>
-                <ul class="level_two">
-                    <li class="up"></li>
-                    <li><a href="./list.html">最 新</a></li>
-                    <li><a href="./list.html">科 技</a></li>
-                    <li><a href="./list.html">股 市</a></li>
-                    <li><a href="./list.html">商 品</a></li>
-                    <li><a href="./list.html">外 汇</a></li>
-                    <li><a href="./list.html">公 司</a></li>
+        <div class="menu_con">
+            <div class="menu">
+                <div class="menu_collapse fl">
+                    <a href="javascript:;" class="level_one"><i class="fa fa-list-ul"></i>全部分类</a>
+                    <ul class="level_two">
+                        <li class="up"></li>
+                        <li v-for="(item, index) in lists" :key="index" @click="quclick(item.id)"><a href="#">{{item.name}}</a></li>
+                    </ul>
+                </div>
+                <ul class="left_menu fl">
+                    <li v-for="(item, index) in lists" :key="index" @click="qusclick(item.id)"><a>{{item.name}}</a></li>
                 </ul>
-            </div>
-            <ul class="left_menu fl">
-                <li><a href="#">最 新</a></li>
-                <li><a href="#">科 技</a></li>
-                <li><a href="#">股 市</a></li>
-                <li><a href="#">商 品</a></li>
-                <li><a href="#">外 汇</a></li>
-                <li><a href="#">公 司</a></li>
-            </ul>
-            <ul class="right_menu fr">
-                <li><a href="#">科技专题</a></li>
-                <li><a href="#">财经专题</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="main_con clearfix">
-        <div class="left_con">
-            <!-- 首页图片模板 -->
-            <cpa></cpa>
-            <div class="common_title">
-                <h3><i class="fa fa-edit"></i> 最新资讯</h3>
-                <a href="#" class="more"><i class="fa fa-angle-double-right"></i></a>
-            </div>
-            <!-- 热点资讯 -->
-            <cpb></cpb>
-
-        </div>
-        <div class="right_con">
-            <div class="common_wrap">
-                <h3><i class="fa fa-bar-chart"></i> 一周热门排行</h3>
-                <!-- 热门排行模板 -->
-               <cpc></cpc>
-            </div>
-            <div class="common_wrap">
-                <h3><i class="fa fa-commenting-o"></i> 最新评论</h3>
-                <!-- 最新评论模板 -->
-                <cpd></cpd>
-            </div>
-            <div class="common_wrap">
-                <h3><i class="fa fa-bullseye"></i> 焦点关注</h3>
-                <ul class="content_list guanzhu_list">
-                    <li><a href="#">神奇的水滴摄影，泡泡中的世界泡泡中的世界</a></li>
-                    <li><a href="#">神奇的水滴摄影，泡泡中的世界</a></li>
-                    <li><a href="#">神奇的水滴摄影，泡泡中的世界</a></li>
-                    <li><a href="#">神奇的水滴摄影，泡泡中的世界</a></li>
-                    <li><a href="#">神奇的水滴摄影，泡泡中的世界</a></li>
-                    <li><a href="#">神奇的水滴摄影，泡泡中的世界</a></li>
-                    <li><a href="#">神奇的水滴摄影，泡泡中的世界</a></li>
+                <ul class="right_menu fr">
+                    <li><a href="#">科技专题</a></li>
+                    <li><a href="#">财经专题</a></li>
                 </ul>
             </div>
         </div>
-    </div>
 
-    <div class="footer clearfix">
-        <div class="foot_link">
-            <a href="#">关于我们</a>
-            <span>|</span>
-            <a href="#">联系我们</a>
-            <span>|</span>
-            <a href="#">招聘人才</a>
-            <span>|</span>
-            <a href="#">友情链接</a>
+        <div class="main_con clearfix">
+            <div class="left_con">
+                <!-- 首页图片模板 -->
+                <cpa></cpa>
+                <div class="common_title">
+                    <h3><i class="fa fa-edit"></i> 最新资讯</h3>
+                    <a href="#" class="more"><i class="fa fa-angle-double-right"></i></a>
+                </div>
+                <!-- 热点资讯 -->
+                <cpb></cpb>
+
+            </div>
+            <div class="right_con">
+                <div class="common_wrap">
+                    <h3><i class="fa fa-bar-chart"></i> 一周热门排行</h3>
+                    <!-- 热门排行模板 -->
+                    <cpc></cpc>
+                </div>
+                <div class="common_wrap">
+                    <h3><i class="fa fa-commenting-o"></i> 最新评论</h3>
+                    <!-- 最新评论模板 -->
+                    <cpd></cpd>
+                </div>
+                <div class="common_wrap">
+                    <h3><i class="fa fa-bullseye"></i> 焦点关注</h3>
+                    <!-- 焦点关注 模板 -->
+                    <cpe></cpe>
+                </div>
+            </div>
         </div>
-        <p>CopyRight © 2019 深圳大事件信息技术股份有限公司 All Rights Reserved</p>
-        <p>电话：0755-****888 粤ICP备*******8号</p>
+
+        <div class="footer clearfix">
+            <div class="foot_link">
+                <a href="#">关于我们</a>
+                <span>|</span>
+                <a href="#">联系我们</a>
+                <span>|</span>
+                <a href="#">招聘人才</a>
+                <span>|</span>
+                <a href="#">友情链接</a>
+            </div>
+            <p>CopyRight © 2019 深圳大事件信息技术股份有限公司 All Rights Reserved</p>
+            <p>电话：0755-****888 粤ICP备*******8号</p>
+        </div>
     </div>
-</div>
 
     <!-- 首页 图片模板 -->
     <template id="cpa">
         <div>
             <ul class="focus_list">
-                <li class=""  v-for="(item, index) in list1" :key="index" :class="index == 0?'first':''">
+                <li class="" v-for="(item, index) in list1" :key="index" :class="index == 0?'first':''">
                     <a href="#"><img :src="item.cover" alt=""></a>
                     <p>{{item.title}}</p>
                 </li>
@@ -122,7 +105,7 @@
     <template id="cpb">
         <div>
             <div class="common_news">
-                <div class="common_news_list" v-for="(item, index) in list2" :key="index" >
+                <div class="common_news_list" v-for="(item, index) in list2" :key="index">
                     <a href="#" class="list_pic"><img :src="item.cover" alt=""></a>
                     <h4><a href="#">{{item.ibtro}}</a></h4>
                     <p>{{item.content}}
@@ -139,9 +122,9 @@
     <!-- 热门 -->
     <template id="cpc">
         <div>
-            <!-- :class="index == 1 ? 'second' : ''" :class="index == 2 ? 'third': ''" -->
             <ul class="content_list hotrank_list">
-                <li v-for="(item, index) in list3" :key="index"><span :class="classs[index]">{{index+1}}</span><a href="#">{{item.title}}</a></li>
+                <li v-for="(item, index) in list" :key="index"><span :class="classs[index]">{{index+1}}</span><a
+                        href="#">{{item.title}}</a></li>
             </ul>
         </div>
     </template>
@@ -149,11 +132,19 @@
     <template id="cpd">
         <div>
             <ul class="content_list comment_list">
-                <li>
-                    <span>山</span>
-                    <b><em>山治</em> 9个月前(08-14)说:</b>
-                    <strong>挺会玩的</strong>
+                <li v-for="(item, index) in list4" :key="index">
+                    <span>{{item.author.substring(0,1)}}</span>
+                    <b><em>{{item.author}}</em> {{item.date}}说:</b>
+                    <strong>{{item.intro}}</strong>
                 </li>
+            </ul>
+        </div>
+    </template>
+    <!-- 焦点模块 -->
+    <template id="cpe">
+        <div>
+            <ul class="content_list guanzhu_list">
+                <li v-for="(item, index) in list5" :key="index"><a href="#">{{item.intro}}</a></li>
             </ul>
         </div>
     </template>
@@ -164,86 +155,132 @@
     <script src="./js/axios.js"></script>
     <script src="./js/vue.js"></script>
 </body>
-    <script>
-        let vm = new Vue({
-            el : '#app',
-            data() {
-                return {
-
-                }
-            },
-            components : {
-                // 首页图片的模板
-                'cpa' : {
-                    template : '#cpa',
-                    data() {
-                        return {
-                            list1 : []
-                        }
-                    },
-                    created() {
-                        // 页面一加载发送ajax 请求渲染页面  
-                        axios.get('http://localhost:8080/api/v1/index/hotpic').then(({data : res}) =>{
-                            if(res.code == 200) {
-                                this.list1 = res.data;
-                            }
-                        })
-                    },
-                },
-                //最新资讯模板
-                'cpb' : {
-                    template : '#cpb',
-                    data() {
-                        return {
-                            list2 : []
-                        }
-                    },
-                    created() {
-                        // 页面一加载发送ajax 请求渲染页面  
-                        axios.get('http://localhost:8080/api/v1/index/latest').then(({data : res}) =>{
-                            if(res.code == 200) {
-                                this.list2 = res.data;
-                            }
-                        })
-                    },
-                },
-                'cpc' : {
-                    template : '#cpc',
-                    data() {
-                        return {
-                            list3 : [],
-                            // 存类名
-                            classs : ['first','second','third']
-                        }
-                    },
-                    created() {
-                        // 页面一加载发送ajax 请求渲染页面  
-                        axios.get('http://localhost:8080/api/v1/index/rank').then(({data : res}) =>{
-                            // console.log(res);
-                            if(res.code == 200) {
-                                this.list3 = res.data;
-                            }
-                        })
-                    },
-                },
-                'cpd' : {
-                    template : '#cpd',
-                    data() {
-                        return {
-                            list4 : [],
-                        }
-                    },
-                    created() {
-                        // 页面一加载发送ajax 请求渲染页面  
-                        axios.get('http://localhost:8080/api/v1/index/latest_comment').then(({data : res}) =>{
-                            console.log(res);
-                            if(res.code == 200) {
-                                this.list4 = res.data;
-                            }
-                        })
-                    },
-                }
+<script>
+    let vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                lists:[]
             }
-        });
-    </script>
+        },
+        methods: {
+            quclick(id) {
+                location.href = './list.html?id='+id;
+            },
+            qusclick(id) {
+                location.href = './list.html?id='+id;
+            }
+        },
+        created() {
+            axios.get('http://localhost:8080/api/v1/index/category').then(({
+                data: res
+            }) => {
+                console.log(res);
+                if (res.code == 200) {
+                    this.lists = res.data;
+                }
+            })
+        },
+        components: {
+            // 首页图片的模板
+            'cpa': {
+                template: '#cpa',
+                data() {
+                    return {
+                        list1: []
+                    }
+                },
+                created() {
+                    // 页面一加载发送ajax 请求渲染页面  
+                    axios.get('http://localhost:8080/api/v1/index/hotpic').then(({
+                        data: res
+                    }) => {
+                        if (res.code == 200) {
+                            this.list1 = res.data;
+                        }
+                    })
+                },
+            },
+            //最新资讯模板
+            'cpb': {
+                template: '#cpb',
+                data() {
+                    return {
+                        list2: []
+                    }
+                },
+                created() {
+                    // 页面一加载发送ajax 请求渲染页面  
+                    axios.get('http://localhost:8080/api/v1/index/latest').then(({
+                        data: res
+                    }) => {
+                        if (res.code == 200) {
+                            this.list2 = res.data;
+                        }
+                    })
+                },
+            },
+            'cpc': {
+                template: '#cpc',
+                data() {
+                    return {
+                        list: [],
+                        // 存类名
+                        classs: ['first', 'second', 'third']
+                    }
+                },
+                created() {
+                    // 页面一加载发送ajax 请求渲染页面  
+                    axios.get('http://localhost:8080/api/v1/index/rank').then(({
+                        data: res
+                    }) => {
+                        // console.log(res);
+                        if (res.code == 200) {
+                            this.list = res.data;
+                        }
+                    })
+                },
+            },
+            'cpd': {
+                template: '#cpd',
+                data() {
+                    return {
+                        list4: [],
+                    }
+                },
+                created() {
+                    // 页面一加载发送ajax 请求渲染页面  
+                    axios.get('http://localhost:8080/api/v1/index/latest_comment').then(({
+                        data: res
+                    }) => {
+                        // console.log(res);
+                        if (res.code == 200) {
+                            this.list4 = res.data;
+                        }
+                    })
+                },
+            },
+            'cpe': {
+                template: '#cpe',
+                data() {
+                    return {
+                        list5: [],
+                    }
+                },
+                created() {
+                    // 页面一加载发送ajax 请求渲染页面  
+                    axios.get('http://localhost:8080/api/v1/index/attention').then(({
+                        data: res
+                    }) => {
+                        // console.log(res);
+                        if (res.code == 200) {
+                            this.list5 = res.data;
+                        }
+                    })
+                },
+            }
+        }
+    });
+</script>
+
 </html>
