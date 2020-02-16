@@ -46,10 +46,10 @@
             <td>{{item.author}}</td>
             <td>{{item.content}}</td>
             <td>{{item.title}}</td>
-            <td>{{item.date}}{{item.time}}</td>
+            <td>{{item.date}}       {{item.time}}</td>
             <td>{{item.state}}</td>
             <td class="text-center">
-              <a href="javascript:void(0);;" class="btn btn-warning btn-xs" v-if="item.state =='待审核'"
+              <a href="javascript:void(0);;" class="btn btn-info btn-xs" v-if="item.state =='待审核'"
                 @click="appclick(item.id)">批准</a>
               <a href="javascript:void(0);;" class="btn btn-warning btn-xs" v-if="item.state =='已通过'" @click="paseclick(item.id)">拒绝</a>
               <a href="javascript:void(0);;" class="btn btn-danger btn-xs" @click="delclick(item.id)">刪除</a>

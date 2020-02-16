@@ -26,7 +26,7 @@
             文章编辑
         </div>
         <div class="container-fluid common_con">
-            <form class="form-horizontal article_form" id="form" ref='formName' v-on:submit.prevent=''>
+            <form class="form-horizontal article_form" id="form" ref='formName' v-on:submit.prevent='' >
                 <div class="form-group">
                     <label for="inputTitle" class="col-sm-2 control-label">文章标题：</label>
                     <div class="col-sm-10">
@@ -64,7 +64,7 @@
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-8">
                         <input type="text" v-model="content" class="form-control" id="rich_content" placeholder="文章内容"
                             value="文章内容">
                     </div>
@@ -80,7 +80,7 @@
     </div>
 
     <template id="cpn">
-        <select class="form-control category">
+        <select class="form-control category" v-model="categoryId" name="categoryId">
             <option v-for="(item, index) in lists" :key="index" :value="item.id">{{item.name}}</option>
         </select>
     </template>
@@ -89,6 +89,7 @@
 <script src="./libs/http.js"></script>
 <script src="./libs/axios.js"></script>
 <script>
+    let hub = new Vue();
     let vm = new Vue({
         el: '#app',
         data() {
@@ -107,13 +108,21 @@
                 template: '#cpn',
                 data() {
                     return {
-                        lists: []
+                        lists: [],
+                        categoryId: ''
                     }
                 },
                 created() {
                     //这里发送ajax 请求 获取文章的列表!!!
                     //请求在到达服务器之前，先会调用use中的这个回调函数来添加请求头信息
                     // 拦截器
+
+                    //接受 父组件里面传过来的 categoryId
+                    hub.$on('e',(categoryId)=>{
+                        // 实时渲染页面
+                        this.categoryId= categoryId;
+                    })
+
                     let config = axios.interceptors.request.use(config => {
                         //为请求头对象，添加token验证的Authorization字段
                         config.headers.Authorization = window.sessionStorage.getItem("token");
@@ -125,6 +134,7 @@
                     }) => {
                         //{data : res} ES 解构
                         console.log(res.data);
+                        // 渲染下拉菜单
                         this.lists = res.data;
                     });
                 },
@@ -143,8 +153,8 @@
                 if (this.state == '草稿') {
                     let fd = new FormData(this.$refs['formName']);
                     fd.append('content', this.content);
-                    fd.append('categoryId', this.categoryId);
                     //追加文章id到fd中去.
+                    console.log(fd.get('categoryId'));
                     fd.append('id', this.id);
                     fd.append('state', '已发布');
                     axios.post(BigNew.article_edit, fd).then(({
@@ -154,6 +164,7 @@
                             //新增成功
                             alert('修改成功!');
                             location.href = './article_list.html';
+                            // location.history.back();  // 历史回退
                         }
                     }).catch(res => {
                         console.log(res)
@@ -161,7 +172,6 @@
                 } else {
                     let fd = new FormData(this.$refs['formName']);
                     fd.append('content', this.content);
-                    fd.append('categoryId', this.categoryId);
                     //追加文章id到fd中去.
                     fd.append('id', this.id);
                     fd.append('state', this.state);
@@ -182,9 +192,9 @@
                 if (this.state == '已发布') {
                     let fd = new FormData(this.$refs['formName']);
                     fd.append('content', this.content);
-                    fd.append('categoryId', this.categoryId);
                     //追加文章id到fd中去.
                     fd.append('id', this.id);
+                    
                     axios.post(BigNew.article_edit, fd).then(({
                         data: res
                     }) => {
@@ -220,8 +230,10 @@
                         console.log(this.titles);
                         this.date = backData.data.date;
                         this.content = backData.data.content;
-                        this.categoryId = backData.data.categoryId;
+                        let categoryId = backData.data.categoryId;
                         this.cover = backData.data.cover;
+                        // 把这个 categoryId 发送到组件中去
+                        hub.$emit('e',categoryId);
                     }
                 }
             });
