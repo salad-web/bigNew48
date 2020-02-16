@@ -34,12 +34,14 @@
                     <a href="javascript:;" class="level_one"><i class="fa fa-list-ul"></i>全部分类</a>
                     <ul class="level_two">
                         <li class="up"></li>
-                        <li v-for="(item, index) in lists" :key="index" @click="quclick(item.id)"><a>{{item.name}}</a>
+                        <li v-for="(item, index) in lists" :key="index" @click="quclick(item.id)">
+                            <a>{{item.name}}</a>
                         </li>
                     </ul>
                 </div>
                 <ul class="left_menu fl">
-                    <li v-for="(item, index) in lists" :key="index" @click="qusclick(item.id)"><a>{{item.name}}</a></li>
+                    <li v-for="(item, index) in lists" :key="index" @click="qusclick(item.id)">
+                        <a>{{item.name}}</a></li>
                 </ul>
                 <ul class="right_menu fr">
                     <li><a href="#">科技专题</a></li>
@@ -61,8 +63,8 @@
             <div class="right_con setfl">
                 <div class="common_wrap">
                     <h3><i class="fa fa-bar-chart"></i> 一周热门排行</h3>
-                   <!-- 热门排行模板 -->
-                   <cpc></cpc>
+                    <!-- 热门排行模板 -->
+                    <cpc></cpc>
                 </div>
                 <div class="common_wrap">
                     <h3><i class="fa fa-commenting-o"></i> 最新评论</h3>
@@ -71,8 +73,8 @@
                 </div>
                 <div class="common_wrap">
                     <h3><i class="fa fa-bullseye"></i> 焦点关注</h3>
-                   <!-- 焦点关注 模板 -->
-                   <cpe></cpe>
+                    <!-- 焦点关注 模板 -->
+                    <cpe></cpe>
                 </div>
             </div>
         </div>
@@ -94,7 +96,7 @@
 
     <template id="cpa">
         <div>
-            <div class="common_news_list"  v-for="(item, index) in list" :key="index">
+            <div class="common_news_list" v-for="(item, index) in list" :key="index">
                 <a href="#" class="list_pic"><img :src="item.cover" alt=""></a>
                 <h4><a href="#">{{item.title}}</a></h4>
                 <p>{{item.content}}
@@ -154,11 +156,50 @@
     });
 </script>
 <script>
+    let hub = new Vue();
     let vm = new Vue({
         el: '#app',
         data() {
             return {
                 lists: []
+            }
+        },
+        methods: {
+            quclick(id) {
+                $.ajax({
+                    type: 'get',
+                    url: 'http://localhost:8080/api/v1/index/search',
+                    dataType: 'json',
+                    data: {
+                        page: 1,
+                        perpage: 10,
+                        key: id
+                    },
+                    success: (backData) => {
+                        if (backData.code == 200) {
+                            let a = backData.data.data;
+                            hub.$emit('d', a)
+                        }
+                    }
+                })
+            },
+            qusclick(id) {
+                $.ajax({
+                    type: 'get',
+                    url: 'http://localhost:8080/api/v1/index/search',
+                    dataType: 'json',
+                    data: {
+                        page: 1,
+                        perpage: 10,
+                        key: id
+                    },
+                    success: (backData) => {
+                        if (backData.code == 200) {
+                            let b = backData.data.data;
+                            hub.$emit('f', b)
+                        }
+                    }
+                })
             }
         },
         created() {
@@ -179,26 +220,37 @@
                         list: []
                     }
                 },
-                mounted() {},
+                methods: {
+                    huo(id) {
+                        $.ajax({
+                            type: 'get',
+                            url: 'http://localhost:8080/api/v1/index/search',
+                            dataType: 'json',
+                            data: {
+                                page: 1,
+                                perpage: 10,
+                                key: id
+                            },
+                            success: (backData) => {
+                                if (backData.code == 200) {
+                                    this.list = backData.data.data;
+                                }
+                            }
+                        })
+                    }
+                },
+                mounted() {
+                    hub.$on('d', (a) => {
+                        this.list = a;
+                    });
+                    hub.$on('f', (b) => {
+                        this.list = b;
+                    });
+                },
                 created() {
                     let id = location.href.split('=')[1];
                     console.log(id);
-                    $.ajax({
-                        type: 'get',
-                        url: 'http://localhost:8080/api/v1/index/search',
-                        dataType: 'json',
-                        data: {
-                            page: 1,
-                            perpage: 10,
-                            key: id
-                        },
-                        success: (backData) => {
-                            console.log(backData);
-                            if (backData.code == 200) {
-                                this.list = backData.data.data;
-                            }
-                        }
-                    })
+                    this.huo(id);
                 },
             },
             'cpc': {

@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet" href="css/main.css">
 </head>
+<style>
+    .cursor {
+        cursor: pointer;
+    }
+</style>
 
 <body>
     <div id="app">
@@ -31,11 +36,11 @@
                     <a href="javascript:;" class="level_one"><i class="fa fa-list-ul"></i>全部分类</a>
                     <ul class="level_two">
                         <li class="up"></li>
-                        <li v-for="(item, index) in lists" :key="index" @click="quclick(item.id)"><a href="#">{{item.name}}</a></li>
+                        <li class="cursor" v-for="(item, index) in lists" :key="index" @click="quclick(item.id)"><a href="#">{{item.name}}</a></li>
                     </ul>
                 </div>
                 <ul class="left_menu fl">
-                    <li v-for="(item, index) in lists" :key="index" @click="qusclick(item.id)"><a>{{item.name}}</a></li>
+                    <li class="cursor" v-for="(item, index) in lists" :key="index" @click="qusclick(item.id)"><a>{{item.name}}</a></li>
                 </ul>
                 <ul class="right_menu fr">
                     <li><a href="#">科技专题</a></li>
@@ -94,7 +99,7 @@
     <template id="cpa">
         <div>
             <ul class="focus_list">
-                <li class="" v-for="(item, index) in list1" :key="index" :class="index == 0?'first':''">
+                <li v-for="(item, index) in list1" :key="index" :class="index == 0?'first':''">
                     <a href="#"><img :src="item.cover" alt=""></a>
                     <p>{{item.title}}</p>
                 </li>
