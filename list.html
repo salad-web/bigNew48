@@ -62,7 +62,9 @@
                 </div>
 
                 <cpa></cpa>
-                <div id="pagination" class="page"></div>
+                <div id="pagination" class="page">
+
+                </div>
 
             </div>
             <div class="right_con setfl">
@@ -149,18 +151,9 @@
     <script src="./js/axios.js"></script>
     <script src="./js/vue.js"></script>
 </body>
-<script>
-    $(function () {
-        $("#pagination").pagination({
-            currentPage: 2,
-            totalPage: 8,
-            callback: function (current) {
-                alert('ok!');
-            }
-        });
-    });
-</script>
-<script>
+
+<script src="./js/list.js"></script>
+<!-- <script>
     let hub = new Vue();
     let vm = new Vue({
         el: '#app',
@@ -310,6 +303,6 @@
             }
         }
     });
-</script>
+</script> -->
 
 </html>
