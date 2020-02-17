@@ -21,8 +21,8 @@
         <div class="header">
             <a href="#" class="logo fl"><img src="images/logo.png" alt="logo"></a>
             <div class="search_form fl">
-                <input type="text" class="search_txt" placeholder="黑洞照片">
-                <button class="search_btn"><i class="fa fa-search"></i></button>
+                <input type="text" class="search_txt" placeholder="黑洞照片" v-model="searchs">
+                <button class="search_btn" @click="searchbtn(searchs)"><i class="fa fa-search"></i></button>
             </div>
             <div class="link_info fr">
                 <a href="#"><i class="fa fa-angle-right"></i>&nbsp;&nbsp;网站地图</a><br>
@@ -36,11 +36,13 @@
                     <a href="javascript:;" class="level_one"><i class="fa fa-list-ul"></i>全部分类</a>
                     <ul class="level_two">
                         <li class="up"></li>
-                        <li class="cursor" v-for="(item, index) in lists" :key="index" @click="quclick(item.id)"><a href="#">{{item.name}}</a></li>
+                        <li class="cursor" v-for="(item, index) in lists" :key="index" @click="quclick(item.id)"><a
+                                href="#">{{item.name}}</a></li>
                     </ul>
                 </div>
                 <ul class="left_menu fl">
-                    <li class="cursor" v-for="(item, index) in lists" :key="index" @click="qusclick(item.id)"><a>{{item.name}}</a></li>
+                    <li class="cursor" v-for="(item, index) in lists" :key="index" @click="qusclick(item.id)">
+                        <a>{{item.name}}</a></li>
                 </ul>
                 <ul class="right_menu fr">
                     <li><a href="#">科技专题</a></li>
@@ -100,7 +102,7 @@
         <div>
             <ul class="focus_list">
                 <li v-for="(item, index) in list1" :key="index" :class="index == 0?'first':''">
-                    <a href="#"><img :src="item.cover" alt=""></a>
+                    <a href="#" @click="pclick(item.id)"><img :src="item.cover" alt=""></a>
                     <p>{{item.title}}</p>
                 </li>
             </ul>
@@ -111,7 +113,7 @@
         <div>
             <div class="common_news">
                 <div class="common_news_list" v-for="(item, index) in list2" :key="index">
-                    <a href="#" class="list_pic"><img :src="item.cover" alt=""></a>
+                    <a href="#" class="list_pic" @click="pclick(item.id)"><img :src="item.cover" alt=""></a>
                     <h4><a href="#">{{item.ibtro}}</a></h4>
                     <p>{{item.content}}
                     </p>
@@ -129,7 +131,7 @@
         <div>
             <ul class="content_list hotrank_list">
                 <li v-for="(item, index) in list" :key="index"><span :class="classs[index]">{{index+1}}</span><a
-                        href="#">{{item.title}}</a></li>
+                        href="#" @click="pclick(item.id)">{{item.title}}</a></li>
             </ul>
         </div>
     </template>
@@ -149,7 +151,7 @@
     <template id="cpe">
         <div>
             <ul class="content_list guanzhu_list">
-                <li v-for="(item, index) in list5" :key="index"><a href="#">{{item.intro}}</a></li>
+                <li v-for="(item, index) in list5" :key="index"><a href="#" @click="pclick(item.id)">{{item.intro}}</a></li>
             </ul>
         </div>
     </template>
@@ -165,16 +167,25 @@
         el: '#app',
         data() {
             return {
-                lists:[]
+                lists: [],
+                searchs: ''
             }
         },
         methods: {
             quclick(id) {
-                location.href = './list.html?id='+id;
+                location.href = './list.html?id=' + id;
             },
             qusclick(id) {
-                location.href = './list.html?id='+id;
-            }
+                location.href = './list.html?id=' + id;
+            },
+            searchbtn(searchs) {
+                if (searchs == '') {
+                    alert('请输入搜索内容!')
+                } else {
+                    location.href = './list.html?id=' + searchs;
+                    this.searchs = ''
+                }
+            },
         },
         created() {
             axios.get('http://localhost:8080/api/v1/index/category').then(({
@@ -195,11 +206,17 @@
                         list1: []
                     }
                 },
+                methods: {
+                    pclick(id) {
+                        location.href = './article.html?id=' + id;
+                    }
+                },
                 created() {
                     // 页面一加载发送ajax 请求渲染页面  
                     axios.get('http://localhost:8080/api/v1/index/hotpic').then(({
                         data: res
                     }) => {
+                        // console.log(res);
                         if (res.code == 200) {
                             this.list1 = res.data;
                         }
@@ -212,6 +229,11 @@
                 data() {
                     return {
                         list2: []
+                    }
+                },
+                methods: {
+                    pclick(id) {
+                        location.href = './article.html?id=' + id;
                     }
                 },
                 created() {
@@ -232,6 +254,11 @@
                         list: [],
                         // 存类名
                         classs: ['first', 'second', 'third']
+                    }
+                },
+                methods: {
+                    pclick(id) {
+                        location.href = './article.html?id=' + id;
                     }
                 },
                 created() {
@@ -270,6 +297,11 @@
                 data() {
                     return {
                         list5: [],
+                    }
+                },
+                methods: {
+                    pclick(id) {
+                        location.href = './article.html?id=' + id;
                     }
                 },
                 created() {

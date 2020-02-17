@@ -13,14 +13,19 @@
     <script type="text/javascript" src="./js/jquery-1.12.4.min.js"></script>
     <script type="text/javascript" src="js/jquery.pagination.min.js"></script>
 </head>
+<style>
+    .cursor {
+        cursor: pointer;
+    }
+</style>
 
 <body>
     <div id="app">
         <div class="header">
             <a href="#" class="logo fl"><img src="images/logo.png" alt="logo"></a>
             <div class="search_form fl">
-                <input type="text" class="search_txt" placeholder="黑洞照片">
-                <button class="search_btn"><i class="fa fa-search"></i></button>
+                <input type="text" class="search_txt" placeholder="黑洞照片" v-model="search">
+                <button class="search_btn" @click="searchclick(search)"><i class="fa fa-search"></i></button>
             </div>
             <div class="link_info fr">
                 <a href="#"><i class="fa fa-angle-right"></i>&nbsp;&nbsp;网站地图</a><br>
@@ -34,13 +39,13 @@
                     <a href="javascript:;" class="level_one"><i class="fa fa-list-ul"></i>全部分类</a>
                     <ul class="level_two">
                         <li class="up"></li>
-                        <li v-for="(item, index) in lists" :key="index" @click="quclick(item.id)">
+                        <li class="cursor" v-for="(item, index) in lists" :key="index" @click="quclick(item.id)">
                             <a>{{item.name}}</a>
                         </li>
                     </ul>
                 </div>
                 <ul class="left_menu fl">
-                    <li v-for="(item, index) in lists" :key="index" @click="qusclick(item.id)">
+                    <li class="cursor" v-for="(item, index) in lists" :key="index" @click="qusclick(item.id)">
                         <a>{{item.name}}</a></li>
                 </ul>
                 <ul class="right_menu fr">
@@ -147,7 +152,7 @@
 <script>
     $(function () {
         $("#pagination").pagination({
-            currentPage: 1,
+            currentPage: 2,
             totalPage: 8,
             callback: function (current) {
                 alert('ok!');
@@ -161,52 +166,55 @@
         el: '#app',
         data() {
             return {
-                lists: []
+                lists: [],
+                search: ''
             }
         },
         methods: {
             quclick(id) {
-                $.ajax({
-                    type: 'get',
-                    url: 'http://localhost:8080/api/v1/index/search',
-                    dataType: 'json',
-                    data: {
-                        page: 1,
-                        perpage: 10,
-                        key: id
-                    },
-                    success: (backData) => {
-                        if (backData.code == 200) {
-                            let a = backData.data.data;
-                            hub.$emit('d', a)
-                        }
-                    }
-                })
+                b = this.huqu(id)
+                hub.$emit('f', b)
             },
             qusclick(id) {
+                b = this.huqu(id)
+                hub.$emit('f', b)
+            },
+            // 文章搜索
+            searchclick(search) {
+                if (search == '') {
+                    alert('输入内容为空')
+                } else {
+                    b = this.huqu(search)
+                    hub.$emit('f', b)
+                    this.search = ''
+                }
+            },
+            huqu(id) {
+                var b;
                 $.ajax({
                     type: 'get',
                     url: 'http://localhost:8080/api/v1/index/search',
                     dataType: 'json',
+                    async: false,
                     data: {
                         page: 1,
-                        perpage: 10,
+                        perpage: 6,
                         key: id
                     },
                     success: (backData) => {
                         if (backData.code == 200) {
-                            let b = backData.data.data;
-                            hub.$emit('f', b)
+                            b = backData.data.data;
                         }
                     }
                 })
+                return b;
             }
         },
         created() {
             axios.get('http://localhost:8080/api/v1/index/category').then(({
                 data: res
             }) => {
-                console.log(res);
+                // console.log(res);
                 if (res.code == 200) {
                     this.lists = res.data;
                 }
@@ -221,36 +229,24 @@
                     }
                 },
                 methods: {
-                    huo(id) {
-                        $.ajax({
-                            type: 'get',
-                            url: 'http://localhost:8080/api/v1/index/search',
-                            dataType: 'json',
-                            data: {
-                                page: 1,
-                                perpage: 10,
-                                key: id
-                            },
-                            success: (backData) => {
-                                if (backData.code == 200) {
-                                    this.list = backData.data.data;
-                                }
-                            }
-                        })
-                    }
+                    
                 },
                 mounted() {
-                    hub.$on('d', (a) => {
-                        this.list = a;
-                    });
                     hub.$on('f', (b) => {
                         this.list = b;
                     });
                 },
                 created() {
-                    let id = location.href.split('=')[1];
-                    console.log(id);
-                    this.huo(id);
+                    let value1 = location.href.split('=')[1];
+                    let value2 = location.href.split('=')[0];
+                    if (value2 == '') return location.href = './list.html';
+                    if (value2 == '?id') {
+                        // 调用父组件中的函数
+                       this.list = this.$parent.huqu(value1);
+                    } else {
+                        value1 = decodeURI(value1);
+                        this.list = this.$parent.huqu(value1);
+                    }
                 },
             },
             'cpc': {
